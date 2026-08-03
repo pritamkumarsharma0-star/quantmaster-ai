@@ -10,8 +10,6 @@ from app.services.question_service import get_random_question
 
 async def simplification_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-print("simplification_quiz called")
-
     question = get_random_question()
 
     context.user_data["current_question"] = question
