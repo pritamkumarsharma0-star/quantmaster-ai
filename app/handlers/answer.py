@@ -1,8 +1,12 @@
+from app.handlers.quiz import simplification_quiz
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 
 async def check_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    async def next_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await simplification_quiz(update, context)
 
     query = update.callback_query
     await query.answer()

@@ -1,9 +1,8 @@
-from app.handlers.answer import check_answer
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
     Application,
-    CommandHandler,
     CallbackQueryHandler,
+    CommandHandler,
     ContextTypes,
     MessageHandler,
     filters,
@@ -11,8 +10,9 @@ from telegram.ext import (
 
 from app.config import BOT_TOKEN
 from app.database import create_tables, SessionLocal
-from app.handlers.topics import study_topics
+from app.handlers.answer import check_answer, next_question
 from app.handlers.quiz import simplification_quiz
+from app.handlers.topics import study_topics
 from app.services.user_service import get_user, create_user
 
 
@@ -65,12 +65,23 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
+
     create_tables()
 
     app = Application.builder().token(BOT_TOKEN).build()
 
+    # Commands
     app.add_handler(CommandHandler("start", start))
 
+    # Callback: Next Question
+    app.add_handler(
+        CallbackQueryHandler(
+            next_question,
+            pattern="^next_question$"
+        )
+    )
+
+    # Callback: Check Answer
     app.add_handler(
         CallbackQueryHandler(
             check_answer,
@@ -78,6 +89,7 @@ def main():
         )
     )
 
+    # Text Menu
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
