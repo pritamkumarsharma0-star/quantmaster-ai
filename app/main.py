@@ -1,40 +1,91 @@
+from app.handlers.answer import check_answer
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
     Application,
     CommandHandler,
+    CallbackQueryHandler,
     ContextTypes,
+    MessageHandler,
+    filters,
 )
 
 from app.config import BOT_TOKEN
+from app.database import create_tables, SessionLocal
+from app.handlers.topics import study_topics
+from app.handlers.quiz import simplification_quiz
+from app.services.user_service import get_user, create_user
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    db = SessionLocal()
+
+    telegram_id = str(update.effective_user.id)
+    name = update.effective_user.first_name
+
+    user = get_user(db, telegram_id)
+
+    if user is None:
+        create_user(db, telegram_id, name)
+        message = f"🎉 Welcome, {name}!\n\nLet's start your Quant preparation."
+    else:
+        message = f"👋 Welcome back, {user.name}!"
+
     keyboard = [
         ["📚 Study Topics", "📝 Practice"],
         ["🎯 Mock Tests", "🔥 Daily Quiz"],
         ["📊 Progress", "👤 Profile"],
     ]
 
-    reply_markup = ReplyKeyboardMarkup(
-        keyboard,
-        resize_keyboard=True
+    await update.message.reply_text(
+        message,
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard,
+            resize_keyboard=True,
+        ),
     )
 
-    await update.message.reply_text(
-        "🎉 Welcome to *QuantMaster AI*\n\n"
-        "Your Quantitative Aptitude companion for Competitive Exams.\n\n"
-        "Choose an option below 👇",
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
+    db.close()
+
+
+async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    text = update.message.text
+
+    if text == "📚 Study Topics":
+        await study_topics(update, context)
+
+    elif text == "➗ Simplification":
+        await simplification_quiz(update, context)
+
+    else:
+        await update.message.reply_text(
+            "🚧 This feature is coming soon."
+        )
 
 
 def main():
+    create_tables()
+
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
 
-    print("✅ QuantMaster AI is running...")
+    app.add_handler(
+        CallbackQueryHandler(
+            check_answer,
+            pattern="^answer_"
+        )
+    )
+
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            menu,
+        )
+    )
+
+    print("✅ QuantMaster AI Started")
 
     app.run_polling()
 

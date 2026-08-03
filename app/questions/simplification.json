@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "question": "125 × 8 ÷ 5 + 25 = ?",
+    "options": [
+      "215",
+      "225",
+      "235",
+      "245"
+    ],
+    "correct": 1,
+    "explanation": "125×8=1000 → 1000÷5=200 → 200+25=225",
+    "difficulty": "Easy",
+    "exam": "SSC CGL"
+  },
+  {
+    "id": 2,
+    "question": "45 + 15 × 2 = ?",
+    "options": [
+      "60",
+      "75",
+      "90",
+      "120"
+    ],
+    "correct": 1,
+    "explanation": "15×2=30 → 45+30=75",
+    "difficulty": "Easy",
+    "exam": "Banking"
+  }
+]

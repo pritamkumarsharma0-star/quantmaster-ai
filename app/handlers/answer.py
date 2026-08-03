@@ -1,0 +1,49 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+
+
+async def check_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    query = update.callback_query
+    await query.answer()
+
+    question = context.user_data.get("current_question")
+
+    if question is None:
+        await query.edit_message_text("❌ Question expired.")
+        return
+
+    selected = int(query.data.split("_")[1])
+
+    if selected == question["correct"]:
+
+        text = (
+            "✅ Correct!\n\n"
+            f"{question['explanation']}"
+        )
+
+    else:
+
+        correct = question["options"][question["correct"]]
+
+        text = (
+            "❌ Wrong!\n\n"
+            f"Correct Answer: {correct}\n\n"
+            f"{question['explanation']}"
+        )
+
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+keyboard = [
+    [
+        InlineKeyboardButton(
+            "➡️ Next Question",
+            callback_data="next_question"
+        )
+    ]
+]
+
+await query.edit_message_text(
+    text,
+    reply_markup=InlineKeyboardMarkup(keyboard)
+)
