@@ -52,17 +52,21 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = update.message.text
 
+    print(f"Menu received: {repr(text)}")
+
     if text == "📚 Study Topics":
+        print("Opening Study Topics")
         await study_topics(update, context)
 
     elif text == "➗ Simplification":
+        print("Opening Simplification Quiz")
         await simplification_quiz(update, context)
 
     else:
+        print("Unknown button:", repr(text))
         await update.message.reply_text(
             "🚧 This feature is coming soon."
         )
-
 
 def main():
 
