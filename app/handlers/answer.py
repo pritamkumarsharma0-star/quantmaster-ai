@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 
 
@@ -16,14 +16,11 @@ async def check_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     selected = int(query.data.split("_")[1])
 
     if selected == question["correct"]:
-
         text = (
             "✅ Correct!\n\n"
             f"{question['explanation']}"
         )
-
     else:
-
         correct = question["options"][question["correct"]]
 
         text = (
@@ -32,18 +29,16 @@ async def check_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"{question['explanation']}"
         )
 
-    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
-keyboard = [
-    [
-        InlineKeyboardButton(
-            "➡️ Next Question",
-            callback_data="next_question"
-        )
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                "➡️ Next Question",
+                callback_data="next_question"
+            )
+        ]
     ]
-]
 
-await query.edit_message_text(
-    text,
-    reply_markup=InlineKeyboardMarkup(keyboard)
-)
+    await query.edit_message_text(
+        text,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
