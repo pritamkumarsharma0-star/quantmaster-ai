@@ -10,10 +10,25 @@ from app.services.question_service import get_random_question
 
 async def simplification_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    question = get_random_question()
+    try:
+        question = get_random_question()
+    except Exception as e:
+        print(e)
 
+        if update.callback_query:
+            await update.callback_query.message.reply_text(
+                f"❌ Error loading question:\n{e}"
+            )
+        else:
+            await update.message.reply_text(
+                f"❌ Error loading question:\n{e}"
+            )
+        return
+
+    # Save current question
     context.user_data["current_question"] = question
 
+    # Create answer buttons
     keyboard = [
         [
             InlineKeyboardButton(

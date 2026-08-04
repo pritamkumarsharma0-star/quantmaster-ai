@@ -60,13 +60,21 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif text == "➗ Simplification":
         print("Opening Simplification Quiz")
-        await simplification_quiz(update, context)
+
+        try:
+            await simplification_quiz(update, context)
+        except Exception as e:
+            print("Quiz Error:", e)
+            await update.message.reply_text(
+                f"❌ Quiz Error:\n{e}"
+            )
 
     else:
         print("Unknown button:", repr(text))
         await update.message.reply_text(
             "🚧 This feature is coming soon."
         )
+
 
 def main():
 
@@ -77,7 +85,7 @@ def main():
     # Commands
     app.add_handler(CommandHandler("start", start))
 
-    # Callback: Next Question
+    # Callback handlers
     app.add_handler(
         CallbackQueryHandler(
             next_question,
@@ -85,7 +93,6 @@ def main():
         )
     )
 
-    # Callback: Check Answer
     app.add_handler(
         CallbackQueryHandler(
             check_answer,
@@ -93,7 +100,7 @@ def main():
         )
     )
 
-    # Text Menu
+    # Menu buttons
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
